@@ -30,6 +30,6 @@ Ten projekt jest udostępniany na licencji MIT - sprawdź plik [LICENSE.md](LICE
 
 ---
 
-**Autor:** [Twój Imię Nazwisko]
+**Autor:** [Balicki , Kubik ,Witkowski , Kujbida]
 
 [MIT License](LICENSE.md)
