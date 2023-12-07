@@ -2,7 +2,7 @@
 
 ## Założenia
 
-Projekt Grafiki Komputerowej, który prezentuje czerwoną kostkę na ekranie. Wykorzystuje OpenGL, GLFW i GLEW. Projekt ten został stworzony w ramach przedmiotu Grafika Komputerowa na Uniwersytecie Fantazji.
+Projekt Grafiki Komputerowej, który prezentuje czerwoną kostkę na ekranie. Wykorzystuje OpenGL, GLFW i GLEW. Projekt ten został stworzony w ramach przedmiotu Grafika Komputerowa.
 
 ### Technologie
 
