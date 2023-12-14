@@ -2,7 +2,7 @@
 
 ## Założenia
 
-Projekt Grafiki Komputerowej. Wykorzystuje OpenGL, GLFW i GLEW. Projekt ten został stworzony w ramach przedmiotu Grafika Komputerowa.
+Projekt Silnik3D. Wykorzystuje OpenGL, GLFW i GLEW. Projekt ten został stworzony w ramach przedmiotu Grafika Komputerowa.
 
 ### Technologie
 
