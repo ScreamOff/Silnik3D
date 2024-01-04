@@ -1,108 +1,78 @@
-#include <iostream>
-#include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
+#include <GL/glu.h>
+float cameraX = 0.0f;
+float cameraY = 0.0f;
+float cameraZ = 5.0f;
 
-class Primitive {
-public:
-    virtual void draw() const = 0;
-    virtual void transform() = 0;
-};
+void processInput(GLFWwindow* window) {
+    const float cameraSpeed = 0.05f;
 
-class ColoredCube : public Primitive {
-private:
-    float size;
-    glm::vec3 color;
-
-public:
-    ColoredCube(float s, const glm::vec3& c) : size(s), color(c) {}
-
-    void draw() const override {
-        glBegin(GL_QUADS);
-        glColor3f(color.r, color.g, color.b);
-
-        // Front
-        glVertex3f(-size, -size, size);
-        glVertex3f(size, -size, size);
-        glVertex3f(size, size, size);
-        glVertex3f(-size, size, size);
-
-        // Back
-        glVertex3f(-size, -size, -size);
-        glVertex3f(size, -size, -size);
-        glVertex3f(size, size, -size);
-        glVertex3f(-size, size, -size);
-
-        // Left
-        glVertex3f(-size, -size, -size);
-        glVertex3f(-size, -size, size);
-        glVertex3f(-size, size, size);
-        glVertex3f(-size, size, -size);
-
-        // Right
-        glVertex3f(size, -size, -size);
-        glVertex3f(size, -size, size);
-        glVertex3f(size, size, size);
-        glVertex3f(size, size, -size);
-
-        // Top
-        glVertex3f(-size, size, -size);
-        glVertex3f(size, size, -size);
-        glVertex3f(size, size, size);
-        glVertex3f(-size, size, size);
-
-        // Bottom
-        glVertex3f(-size, -size, -size);
-        glVertex3f(size, -size, -size);
-        glVertex3f(size, -size, size);
-        glVertex3f(-size, -size, size);
-        glEnd();
-    }
-
-    void transform() override {
-        // Implementacja transformacji geometrycznych dla sześcianu (opcjonalne)
-    }
-};
-
-class GraphicsEngine {
-private:
-    GLFWwindow* window;
-
-public:
-    GraphicsEngine(GLFWwindow* w) : window(w) {}
-
-    void handleKeyboardInput(int key, int scancode, int action, int mods) {
-        // Obsługa klawiatury (opcjonalne)
-    }
-
-    void handleMouseInput(double xpos, double ypos) {
-        // Obsługa myszy (opcjonalne)
-    }
-
-    void update() {
-        // Aktualizacja logiki gry (opcjonalne)
-    }
-
-    void draw(Primitive& primitive) {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        primitive.transform();
-        primitive.draw();
-
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-};
-
-void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    GraphicsEngine* engine = static_cast<GraphicsEngine*>(glfwGetWindowUserPointer(window));
-    engine->handleKeyboardInput(key, scancode, action, mods);
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        cameraZ -= cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        cameraZ += cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        cameraX -= cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        cameraX += cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+        cameraY -= cameraSpeed;
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+        cameraY += cameraSpeed;
 }
 
-void mouseCallback(GLFWwindow* window, double xpos, double ypos) {
-    GraphicsEngine* engine = static_cast<GraphicsEngine*>(glfwGetWindowUserPointer(window));
-    engine->handleMouseInput(xpos, ypos);
+void drawCube() {
+    glColor3f(1.0, 0.0, 0.0);
+    glBegin(GL_QUADS);
+    // Front face
+    glVertex3f(-0.5, -0.5, 0.5);
+    glVertex3f(0.5, -0.5, 0.5);
+    glVertex3f(0.5, 0.5, 0.5);
+    glVertex3f(-0.5, 0.5, 0.5);
+
+    // Back face
+    glVertex3f(-0.5, -0.5, -0.5);
+    glVertex3f(0.5, -0.5, -0.5);
+    glVertex3f(0.5, 0.5, -0.5);
+    glVertex3f(-0.5, 0.5, -0.5);
+
+    // Left face
+    glVertex3f(-0.5, -0.5, 0.5);
+    glVertex3f(-0.5, 0.5, 0.5);
+    glVertex3f(-0.5, 0.5, -0.5);
+    glVertex3f(-0.5, -0.5, -0.5);
+
+    // Right face
+    glVertex3f(0.5, -0.5, 0.5);
+    glVertex3f(0.5, 0.5, 0.5);
+    glVertex3f(0.5, 0.5, -0.5);
+    glVertex3f(0.5, -0.5, -0.5);
+
+    // Top face
+    glVertex3f(-0.5, 0.5, 0.5);
+    glVertex3f(0.5, 0.5, 0.5);
+    glVertex3f(0.5, 0.5, -0.5);
+    glVertex3f(-0.5, 0.5, -0.5);
+
+    // Bottom face
+    glVertex3f(-0.5, -0.5, 0.5);
+    glVertex3f(0.5, -0.5, 0.5);
+    glVertex3f(0.5, -0.5, -0.5);
+    glVertex3f(-0.5, -0.5, -0.5);
+
+    glEnd();
+}
+void renderScene() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity();
+
+    gluPerspective(45.0, 1.0, 1.0, 10.0);
+    gluLookAt(cameraX, cameraY, cameraZ, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+
+    drawCube();
+
+    glFlush();
 }
 
 int main() {
@@ -111,10 +81,10 @@ int main() {
         return -1;
     }
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Graphics Engine", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(800, 800, "OpenGL Cube", nullptr, nullptr);
     if (!window) {
         std::cerr << "Failed to create GLFW window\n";
         glfwTerminate();
@@ -122,30 +92,20 @@ int main() {
     }
 
     glfwMakeContextCurrent(window);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-    if (glewInit() != GLEW_OK) {
-        std::cerr << "Failed to initialize GLEW\n";
-        glfwTerminate();
-        return -1;
-    }
-
     glEnable(GL_DEPTH_TEST);
 
-    GraphicsEngine engine(window);
-
-    glfwSetWindowUserPointer(window, &engine);
-    glfwSetKeyCallback(window, keyCallback);
-    glfwSetCursorPosCallback(window, mouseCallback);
-
-    // Czerwona kostka o rozmiarze 2
-    ColoredCube redCube(2.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-
     while (!glfwWindowShouldClose(window)) {
-        engine.update();
-        engine.draw(redCube);
+        glfwPollEvents();
+
+        processInput(window);  // Dodane przetwarzanie wejścia
+
+        renderScene();
+
+        glfwSwapBuffers(window);
     }
 
+    glfwDestroyWindow(window);
     glfwTerminate();
+
     return 0;
 }
