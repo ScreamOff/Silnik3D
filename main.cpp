@@ -131,6 +131,121 @@ private:
     float size;
 };
 
+class RectangularPrism : public Shape {
+public:
+    RectangularPrism(float length, float width, float height) : length(length), width(width), height(height), position(glm::vec3(0.0f, 0.0f, 0.0f)) {}
+
+    void setPosition(const glm::vec3& newPosition) {
+        position = newPosition;
+    }
+
+    void draw() const override {
+        // Front face
+        glColor3fv(frontColor);
+        glBegin(GL_QUADS);
+        glVertex3f(-length / 2, -width / 2, height / 2);
+        glVertex3f(length / 2, -width / 2, height / 2);
+        glVertex3f(length / 2, width / 2, height / 2);
+        glVertex3f(-length / 2, width / 2, height / 2);
+        glEnd();
+
+        // Back face
+        glColor3fv(backColor);
+        glBegin(GL_QUADS);
+        glVertex3f(-length / 2, -width / 2, -height / 2);
+        glVertex3f(length / 2, -width / 2, -height / 2);
+        glVertex3f(length / 2, width / 2, -height / 2);
+        glVertex3f(-length / 2, width / 2, -height / 2);
+        glEnd();
+
+        // Left face
+        glColor3fv(leftColor);
+        glBegin(GL_QUADS);
+        glVertex3f(-length / 2, -width / 2, height / 2);
+        glVertex3f(-length / 2, width / 2, height / 2);
+        glVertex3f(-length / 2, width / 2, -height / 2);
+        glVertex3f(-length / 2, -width / 2, -height / 2);
+        glEnd();
+
+        // Right face
+        glColor3fv(rightColor);
+        glBegin(GL_QUADS);
+        glVertex3f(length / 2, -width / 2, height / 2);
+        glVertex3f(length / 2, width / 2, height / 2);
+        glVertex3f(length / 2, width / 2, -height / 2);
+        glVertex3f(length / 2, -width / 2, -height / 2);
+        glEnd();
+
+        // Top face
+        glColor3fv(topColor);
+        glBegin(GL_QUADS);
+        glVertex3f(-length / 2, width / 2, height / 2);
+        glVertex3f(length / 2, width / 2, height / 2);
+        glVertex3f(length / 2, width / 2, -height / 2);
+        glVertex3f(-length / 2, width / 2, -height / 2);
+        glEnd();
+
+        // Bottom face
+        glColor3fv(bottomColor);
+        glBegin(GL_QUADS);
+        glVertex3f(-length / 2, -width / 2, height / 2);
+        glVertex3f(length / 2, -width / 2, height / 2);
+        glVertex3f(length / 2, -width / 2, -height / 2);
+        glVertex3f(-length / 2, -width / 2, -height / 2);
+        glEnd();
+    }
+
+    void setFrontColor(GLfloat r, GLfloat g, GLfloat b) {
+        frontColor[0] = r;
+        frontColor[1] = g;
+        frontColor[2] = b;
+    }
+
+    void setBackColor(GLfloat r, GLfloat g, GLfloat b) {
+        backColor[0] = r;
+        backColor[1] = g;
+        backColor[2] = b;
+    }
+
+    void setLeftColor(GLfloat r, GLfloat g, GLfloat b) {
+        leftColor[0] = r;
+        leftColor[1] = g;
+        leftColor[2] = b;
+    }
+
+    void setRightColor(GLfloat r, GLfloat g, GLfloat b) {
+        rightColor[0] = r;
+        rightColor[1] = g;
+        rightColor[2] = b;
+    }
+
+    void setTopColor(GLfloat r, GLfloat g, GLfloat b) {
+        topColor[0] = r;
+        topColor[1] = g;
+        topColor[2] = b;
+    }
+
+    void setBottomColor(GLfloat r, GLfloat g, GLfloat b) {
+        bottomColor[0] = r;
+        bottomColor[1] = g;
+        bottomColor[2] = b;
+    }
+
+private:
+    GLfloat frontColor[3] = { 1.0f, 0.0f, 0.0f };
+    GLfloat backColor[3] = { 0.0f, 1.0f, 0.0f };
+    GLfloat leftColor[3] = { 0.0f, 0.0f, 1.0f };
+    GLfloat rightColor[3] = { 1.0f, 1.0f, 0.0f };
+    GLfloat topColor[3] = { 1.0f, 0.0f, 1.0f };
+    GLfloat bottomColor[3] = { 0.0f, 1.0f, 1.0f };
+    glm::vec3 position;
+
+    float length, width, height;
+};
+
+RectangularPrism rectangularPrism(1.5f, 2.0f, 1.0f); // Początkowe rozmiary prostopadłościanu
+
+
 class Pyramid : public Shape {
 public:
     Pyramid(float size) : size(size), position(glm::vec3(0.0f, 0.0f, 0.0f)) {}
@@ -275,10 +390,37 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
         pyramid.setBackRightColor(static_cast<float>(rand()) / RAND_MAX,
             static_cast<float>(rand()) / RAND_MAX,
             static_cast<float>(rand()) / RAND_MAX);
+
+        // Zmiana koloru prostopadłościanu po kliknięciu lewego przycisku myszy
+        rectangularPrism.setFrontColor(static_cast<float>(rand()) / RAND_MAX,
+            static_cast<float>(rand()) / RAND_MAX,
+            static_cast<float>(rand()) / RAND_MAX);
+
+        rectangularPrism.setBackColor(static_cast<float>(rand()) / RAND_MAX,
+            static_cast<float>(rand()) / RAND_MAX,
+            static_cast<float>(rand()) / RAND_MAX);
+
+        rectangularPrism.setLeftColor(static_cast<float>(rand()) / RAND_MAX,
+            static_cast<float>(rand()) / RAND_MAX,
+            static_cast<float>(rand()) / RAND_MAX);
+
+        rectangularPrism.setRightColor(static_cast<float>(rand()) / RAND_MAX,
+            static_cast<float>(rand()) / RAND_MAX,
+            static_cast<float>(rand()) / RAND_MAX);
+
+        rectangularPrism.setTopColor(static_cast<float>(rand()) / RAND_MAX,
+            static_cast<float>(rand()) / RAND_MAX,
+            static_cast<float>(rand()) / RAND_MAX);
+
+        rectangularPrism.setBottomColor(static_cast<float>(rand()) / RAND_MAX,
+            static_cast<float>(rand()) / RAND_MAX,
+            static_cast<float>(rand()) / RAND_MAX);
     }
 }
 
-void renderScene(const Shape& shape1, const Shape& shape2) {
+
+
+void renderScene(const Shape& shape1, const Shape& shape2, const Shape& shape3) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
@@ -302,8 +444,17 @@ void renderScene(const Shape& shape1, const Shape& shape2) {
 
     shape2.draw();
 
+    // Render rectangular prism
+    view = glm::lookAt(glm::vec3(cameraX + 4.0f, cameraY, cameraZ + 6.0f), glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    viewMatrixPtr = glm::value_ptr(view);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadMatrixf(viewMatrixPtr);
+
+    shape3.draw();
+
     glFlush();
 }
+
 
 int main() {
     if (!glfwInit()) {
@@ -334,8 +485,10 @@ int main() {
         // Ustawienia początkowe pozycji obiektów
         cube.setPosition(glm::vec3(-5.0f, 10.0f, 100.0f));
         pyramid.setPosition(glm::vec3(700.0f, 25.0f, 200.0f));
+        rectangularPrism.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
 
-        renderScene(cube, pyramid);
+
+        renderScene(cube, pyramid, rectangularPrism);
 
         glfwSwapBuffers(window);
     }
