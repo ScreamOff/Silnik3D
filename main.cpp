@@ -1,8 +1,15 @@
+#include <glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <GL/glut.h>
+
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 
 
 class Shape {
@@ -14,27 +21,92 @@ public:
         color[2] = b;
     }
 
+    // Dodane metody do obsługi tekstur
+    void setTexture(const char* texturePath) {
+        glGenTextures(1, &textureID);
+        glBindTexture(GL_TEXTURE_2D, textureID);
+
+        // Load image with stb_image
+        int width, height, nrChannels;
+        stbi_set_flip_vertically_on_load(true);
+        std::string fullPath = R"(C:\\Users\\User\\Desktop\\Projekt3D\\Projekt3D\\tlo.png)" + std::string(texturePath);
+        unsigned char* data = stbi_load(fullPath.c_str(), &width, &height, &nrChannels, 0);
+
+        if (data) {
+            // Set texture parameters
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+            // Specify texture image
+            if (nrChannels == 3) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            }
+            else if (nrChannels == 4) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            }
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+        else {
+            std::cerr << "Failed to load texture: " << stbi_failure_reason() << '\n';
+        }
+
+        stbi_image_free(data);
+    }
+
+
 protected:
     GLfloat color[3] = { 1.0f, 1.0f, 1.0f }; // Default color is white
+    GLuint textureID = 0; // ID tekstury
 };
+
 
 
 class Cube : public Shape {
 public:
-    Cube(float size) : size(size), position(glm::vec3(0.0f, 0.0f, 0.0f)) {}
+    Cube(float size) : size(size), position(glm::vec3(0.0f, 0.0f, 0.0f)) {
+        // Przeniesienie inicjalizacji tekstury do konstruktora
+        setTexture("tlo.png");
+    }
 
     void setPosition(const glm::vec3& newPosition) {
         position = newPosition;
     }
 
+    void setTexture(const char* texturePath) {
+        glGenTextures(1, &textureID);
+        glBindTexture(GL_TEXTURE_2D, textureID);
+
+        // Wczytanie obrazu z pliku
+        int width, height, nrChannels;
+        stbi_set_flip_vertically_on_load(true);
+        unsigned char* data = stbi_load(texturePath, &width, &height, &nrChannels, 0);
+
+        if (data) {
+            // Ustawienie parametrów tekstury i przypisanie obrazu do tekstury
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        }
+        else {
+            std::cerr << "Failed to load texture: " << stbi_failure_reason() << '\n';
+        }
+
+        stbi_image_free(data);
+    }
+
+
     void draw() const override {
         // Front face
-        glColor3fv(frontColor);
+        glBindTexture(GL_TEXTURE_2D, textureID);
         glBegin(GL_QUADS);
-        glVertex3f(-size / 2, -size / 2, size / 2);
-        glVertex3f(size / 2, -size / 2, size / 2);
-        glVertex3f(size / 2, size / 2, size / 2);
-        glVertex3f(-size / 2, size / 2, size / 2);
+        glTexCoord2f(0.0f, 0.0f); glVertex3f(-size / 2, -size / 2, size / 2);
+        glTexCoord2f(1.0f, 0.0f); glVertex3f(size / 2, -size / 2, size / 2);
+        glTexCoord2f(1.0f, 1.0f); glVertex3f(size / 2, size / 2, size / 2);
+        glTexCoord2f(0.0f, 1.0f); glVertex3f(-size / 2, size / 2, size / 2);
         glEnd();
 
         // Back face
@@ -133,10 +205,35 @@ private:
 
 class RectangularPrism : public Shape {
 public:
-    RectangularPrism(float length, float width, float height) : length(length), width(width), height(height), position(glm::vec3(0.0f, 0.0f, 0.0f)) {}
+    RectangularPrism(float length, float width, float height) : length(length), width(width), height(height), position(glm::vec3(0.0f, 0.0f, 0.0f)) {
+        // Przeniesienie inicjalizacji tekstury do konstruktora
+        setTexture("tlo.png");
+    }
 
     void setPosition(const glm::vec3& newPosition) {
         position = newPosition;
+
+    }
+
+    void setTexture(const char* texturePath) {
+        glGenTextures(1, &textureID);
+        glBindTexture(GL_TEXTURE_2D, textureID);
+
+        // Wczytanie obrazu z pliku
+        int width, height, nrChannels;
+        stbi_set_flip_vertically_on_load(true);
+        unsigned char* data = stbi_load(texturePath, &width, &height, &nrChannels, 0);
+
+        if (data) {
+            // Ustawienie parametrów tekstury i przypisanie obrazu do tekstury
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+        else {
+            std::cerr << "Failed to load texture\n";
+        }
+
+        stbi_image_free(data);
     }
 
     void draw() const override {
@@ -248,10 +345,43 @@ RectangularPrism rectangularPrism(1.5f, 2.0f, 1.0f); // Początkowe rozmiary pro
 
 class Pyramid : public Shape {
 public:
-    Pyramid(float size) : size(size), position(glm::vec3(0.0f, 0.0f, 0.0f)) {}
+    Pyramid(float size) : size(size), position(glm::vec3(0.0f, 0.0f, 0.0f)) {
+        // Przeniesienie inicjalizacji tekstury do konstruktora
+        setTexture("tlo.png");
+    }
+
+    void setSize(float newSize) {
+        size = newSize;
+    }
+
+    float getSize() const {
+        return size;
+    }
+
 
     void setPosition(const glm::vec3& newPosition) {
         position = newPosition;
+    }
+
+    void setTexture(const char* texturePath) {
+        glGenTextures(1, &textureID);
+        glBindTexture(GL_TEXTURE_2D, textureID);
+
+        // Wczytanie obrazu z pliku
+        int width, height, nrChannels;
+        stbi_set_flip_vertically_on_load(true);
+        unsigned char* data = stbi_load(texturePath, &width, &height, &nrChannels, 0);
+
+        if (data) {
+            // Ustawienie parametrów tekstury i przypisanie obrazu do tekstury
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+        else {
+            std::cerr << "Failed to load texture\n";
+        }
+
+        stbi_image_free(data);
     }
 
     void draw() const override {
@@ -332,6 +462,7 @@ Pyramid pyramid(1.0f); // Początkowy rozmiar piramidy
 
 void processInput(GLFWwindow* window) {
     const float cameraSpeed = 0.001f;
+    const float scaleSpeed = 0.001f;
 
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         cameraZ -= cameraSpeed;
@@ -345,6 +476,16 @@ void processInput(GLFWwindow* window) {
         cameraY -= cameraSpeed;
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
         cameraY += cameraSpeed;
+
+    // Sprawdź, czy przycisk "=" został naciśnięty
+    if (glfwGetKey(window, GLFW_KEY_EQUAL) == GLFW_PRESS) {
+        // Zwiększ rozmiar piramidy
+        pyramid.setSize(pyramid.getSize() + scaleSpeed);
+    }
+    if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) {
+        // Zwiększ rozmiar piramidy
+        pyramid.setSize(pyramid.getSize() - scaleSpeed);
+    }
 }
 
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
@@ -420,9 +561,32 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
 
 
 
+
 void renderScene(const Shape& shape1, const Shape& shape2, const Shape& shape3) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
+
+    // Set up light properties
+    GLfloat lightPosition[] = { 0.0f, 0.0f, 5.0f, 1.0f };  // Light position in eye space
+    GLfloat lightAmbient[] = { 0.2f, 0.2f, 0.2f, 1.0f };    // Ambient light color
+    GLfloat lightDiffuse[] = { 1.0f, 1.0f, 1.0f, 1.0f };    // Diffuse light color
+    GLfloat lightSpecular[] = { 1.0f, 1.0f, 1.0f, 1.0f };   // Specular light color
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+
+
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+    glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
+
+    // Enable material properties
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Render cube
     glm::mat4 projection = glm::perspective(glm::radians(30.0f), 1.0f, 0.1f, 100.0f);
@@ -456,12 +620,16 @@ void renderScene(const Shape& shape1, const Shape& shape2, const Shape& shape3) 
 }
 
 
+
 int main() {
     if (!glfwInit()) {
         std::cerr << "Failed to initialize GLFW\n";
         return -1;
     }
 
+    glEnable(GL_TEXTURE_2D);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 
@@ -473,6 +641,12 @@ int main() {
     }
 
     glfwMakeContextCurrent(window);
+
+    if (glewInit() != GLEW_OK) {
+        std::cerr << "Failed to initialize GLEW\n";
+        return -1;
+    }
+
     glEnable(GL_DEPTH_TEST);
 
     glfwSetMouseButtonCallback(window, mouseButtonCallback);
@@ -486,7 +660,6 @@ int main() {
         cube.setPosition(glm::vec3(-5.0f, 10.0f, 100.0f));
         pyramid.setPosition(glm::vec3(700.0f, 25.0f, 200.0f));
         rectangularPrism.setPosition(glm::vec3(0.0f, 0.0f, 0.0f));
-
 
         renderScene(cube, pyramid, rectangularPrism);
 
