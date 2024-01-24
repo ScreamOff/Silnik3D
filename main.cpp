@@ -11,17 +11,19 @@
 #include "stb_image.h"
 
 
-
+/// Klasa przedstawiająca kształt figury(Obsługująca prymitywy)
 class Shape {
 public:
+    /// Podstawowa Metoda do rysowania
     virtual void draw() const = 0;
+    /// Podstawowa Metoda do ustawienia koloru
     virtual void setColor(GLfloat r, GLfloat g, GLfloat b) {
         color[0] = r;
         color[1] = g;
         color[2] = b;
     }
 
-    // Dodane metody do obsługi tekstur
+    /// Metoda do obsługi tekstur
     void setTexture(const char* texturePath) {
         glGenTextures(1, &textureID);
         glBindTexture(GL_TEXTURE_2D, textureID);
@@ -57,23 +59,28 @@ public:
 
 
 protected:
-    GLfloat color[3] = { 1.0f, 1.0f, 1.0f }; // Default color is white
+    /// Zmienna przedstawaijaca wartości koloru
+    ///
+    /// Początkowo jest biała
+    GLfloat color[3] = { 1.0f, 1.0f, 1.0f };
+    /// Zmienna przedstawaijaca wartości id_tekstury
     GLuint textureID = 0; // ID tekstury
 };
 
 
-
+/// Klasa przedstawiająca prymityw Sześcianu dzieczicząca po klasie Shape
 class Cube : public Shape {
 public:
+    /// Konstruktor który pobiera wielkość Sześcianu
     Cube(float size) : size(size), position(glm::vec3(0.0f, 0.0f, 0.0f)) {
         // Przeniesienie inicjalizacji tekstury do konstruktora
         setTexture("tlo.png");
     }
-
+    /// Metoda pobierająca pozycje Sześcianu
     void setPosition(const glm::vec3& newPosition) {
         position = newPosition;
     }
-
+    /// Metoda pobierająca ścieżke do tekstury i ustawaijąca teksture
     void setTexture(const char* texturePath) {
         glGenTextures(1, &textureID);
         glBindTexture(GL_TEXTURE_2D, textureID);
@@ -107,7 +114,7 @@ public:
         stbi_image_free(data);
     }
 
-
+    /// Metoda rysująca Sześcian
     void draw() const override {
         // Front face
         glBindTexture(GL_TEXTURE_2D, textureID);
@@ -163,37 +170,37 @@ public:
         glVertex3f(-size / 2, -size / 2, -size / 2);
         glEnd();
     }
-
+    /// Metoda nadająca kolor przedniej części Sześcian
     void setFrontColor(GLfloat r, GLfloat g, GLfloat b) {
         frontColor[0] = r;
         frontColor[1] = g;
         frontColor[2] = b;
     }
-
+    /// Metoda nadająca kolor tylniej części Sześcian
     void setBackColor(GLfloat r, GLfloat g, GLfloat b) {
         backColor[0] = r;
         backColor[1] = g;
         backColor[2] = b;
     }
-
+    /// Metoda nadająca kolor lewej części Sześcian
     void setLeftColor(GLfloat r, GLfloat g, GLfloat b) {
         leftColor[0] = r;
         leftColor[1] = g;
         leftColor[2] = b;
     }
-
+    /// Metoda nadająca kolor prawej części Sześcian
     void setRightColor(GLfloat r, GLfloat g, GLfloat b) {
         rightColor[0] = r;
         rightColor[1] = g;
         rightColor[2] = b;
     }
-
+    /// Metoda nadająca kolor górnej części Sześcian
     void setTopColor(GLfloat r, GLfloat g, GLfloat b) {
         topColor[0] = r;
         topColor[1] = g;
         topColor[2] = b;
     }
-
+    /// Metoda nadająca kolor dolnej części Sześcian
     void setBottomColor(GLfloat r, GLfloat g, GLfloat b) {
         bottomColor[0] = r;
         bottomColor[1] = g;
@@ -212,29 +219,32 @@ private:
     float size;
 };
 
+/// Klasa reprezentująca prostopadłościan dziedzicząca po klasie Shape
 class RectangularPrism : public Shape {
 public:
+    /// Konstruktor inicjalizujący rozmiary prostopadłościanu oraz pozycję
     RectangularPrism(float length, float width, float height) : length(length), width(width), height(height), position(glm::vec3(0.0f, 0.0f, 0.0f)) {
-        // Przeniesienie inicjalizacji tekstury do konstruktora
+        /// Przeniesienie inicjalizacji tekstury do konstruktora
         setTexture("tlo.png");
     }
 
+    /// Metoda ustawiająca pozycję prostopadłościanu
     void setPosition(const glm::vec3& newPosition) {
         position = newPosition;
-
     }
 
+    /// Metoda ustawiająca teksturę prostopadłościanu
     void setTexture(const char* texturePath) {
         glGenTextures(1, &textureID);
         glBindTexture(GL_TEXTURE_2D, textureID);
 
-        // Wczytanie obrazu z pliku
+        /// Wczytanie obrazu z pliku
         int width, height, nrChannels;
         stbi_set_flip_vertically_on_load(true);
         unsigned char* data = stbi_load(texturePath, &width, &height, &nrChannels, 0);
 
         if (data) {
-            // Ustawienie parametrów tekstury i przypisanie obrazu do tekstury
+            /// Ustawienie parametrów tekstury i przypisanie obrazu do tekstury
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
             glGenerateMipmap(GL_TEXTURE_2D);
         }
@@ -245,6 +255,7 @@ public:
         stbi_image_free(data);
     }
 
+    /// Metoda rysująca prostopadłościan
     void draw() const override {
         // Front face
         glColor3fv(frontColor);
@@ -301,36 +312,42 @@ public:
         glEnd();
     }
 
+    /// Metoda ustawiająca kolor frontowej części prostopadłościanu
     void setFrontColor(GLfloat r, GLfloat g, GLfloat b) {
         frontColor[0] = r;
         frontColor[1] = g;
         frontColor[2] = b;
     }
 
+    /// Metoda ustawiająca kolor tylniej części prostopadłościanu
     void setBackColor(GLfloat r, GLfloat g, GLfloat b) {
         backColor[0] = r;
         backColor[1] = g;
         backColor[2] = b;
     }
 
+    /// Metoda ustawiająca kolor lewej części prostopadłościanu
     void setLeftColor(GLfloat r, GLfloat g, GLfloat b) {
         leftColor[0] = r;
         leftColor[1] = g;
         leftColor[2] = b;
     }
 
+    /// Metoda ustawiająca kolor prawej części prostopadłościanu
     void setRightColor(GLfloat r, GLfloat g, GLfloat b) {
         rightColor[0] = r;
         rightColor[1] = g;
         rightColor[2] = b;
     }
 
+    /// Metoda ustawiająca kolor górnej części prostopadłościanu
     void setTopColor(GLfloat r, GLfloat g, GLfloat b) {
         topColor[0] = r;
         topColor[1] = g;
         topColor[2] = b;
     }
 
+    /// Metoda ustawiająca kolor dolnej części prostopadłościanu
     void setBottomColor(GLfloat r, GLfloat g, GLfloat b) {
         bottomColor[0] = r;
         bottomColor[1] = g;
@@ -338,51 +355,46 @@ public:
     }
 
 private:
-    GLfloat frontColor[3] = { 1.0f, 0.0f, 0.0f };
-    GLfloat backColor[3] = { 0.0f, 1.0f, 0.0f };
-    GLfloat leftColor[3] = { 0.0f, 0.0f, 1.0f };
-    GLfloat rightColor[3] = { 1.0f, 1.0f, 0.0f };
-    GLfloat topColor[3] = { 1.0f, 0.0f, 1.0f };
-    GLfloat bottomColor[3] = { 0.0f, 1.0f, 1.0f };
-    glm::vec3 position;
-
-    float length, width, height;
+    GLfloat frontColor[3] = { 1.0f, 0.0f, 0.0f
+    }
 };
 
-RectangularPrism rectangularPrism(1.5f, 2.0f, 1.0f); // Początkowe rozmiary prostopadłościanu
-
-
+/// Klasa reprezentująca piramidę dziedzicząca po klasie Shape
 class Pyramid : public Shape {
 public:
+    /// Konstruktor inicjalizujący rozmiar piramidy oraz pozycję
     Pyramid(float size) : size(size), position(glm::vec3(0.0f, 0.0f, 0.0f)) {
-        // Przeniesienie inicjalizacji tekstury do konstruktora
+        /// Przeniesienie inicjalizacji tekstury do konstruktora
         setTexture("tlo.png");
     }
 
+    /// Metoda ustawiająca rozmiar piramidy
     void setSize(float newSize) {
         size = newSize;
     }
 
+    /// Metoda pobierająca rozmiar piramidy
     float getSize() const {
         return size;
     }
 
-
+    /// Metoda ustawiająca pozycję piramidy
     void setPosition(const glm::vec3& newPosition) {
         position = newPosition;
     }
 
+    /// Metoda ustawiająca teksturę piramidy
     void setTexture(const char* texturePath) {
         glGenTextures(1, &textureID);
         glBindTexture(GL_TEXTURE_2D, textureID);
 
-        // Wczytanie obrazu z pliku
+        /// Wczytanie obrazu z pliku
         int width, height, nrChannels;
         stbi_set_flip_vertically_on_load(true);
         unsigned char* data = stbi_load(texturePath, &width, &height, &nrChannels, 0);
 
         if (data) {
-            // Ustawienie parametrów tekstury i przypisanie obrazu do tekstury
+            /// Ustawienie parametrów tekstury i przypisanie obrazu do tekstury
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
             glGenerateMipmap(GL_TEXTURE_2D);
         }
@@ -393,6 +405,7 @@ public:
         stbi_image_free(data);
     }
 
+    /// Metoda rysująca piramidę
     void draw() const override {
         // Base
         glColor3fv(baseColor);
@@ -435,30 +448,35 @@ public:
         glEnd();
     }
 
+    /// Metoda ustawiająca kolor podstawy piramidy
     void setBaseColor(GLfloat r, GLfloat g, GLfloat b) {
         baseColor[0] = r;
         baseColor[1] = g;
         baseColor[2] = b;
     }
 
+    /// Metoda ustawiająca kolor frontowej ściany piramidy
     void setFrontColor(GLfloat r, GLfloat g, GLfloat b) {
         frontColor[0] = r;
         frontColor[1] = g;
         frontColor[2] = b;
     }
 
+    /// Metoda ustawiająca kolor tylnego lewego rogu piramidy
     void setBackLeftColor(GLfloat r, GLfloat g, GLfloat b) {
         backLeftColor[0] = r;
         backLeftColor[1] = g;
         backLeftColor[2] = b;
     }
 
+    /// Metoda ustawiająca kolor tylnego prawego rogu piramidy
     void setBackRightColor(GLfloat r, GLfloat g, GLfloat b) {
         backRightColor[0] = r;
         backRightColor[1] = g;
         backRightColor[2] = b;
     }
 
+    /// Metoda ustawiająca kolor tyłu piramidy
     void setBackColor(GLfloat r, GLfloat g, GLfloat b) {
         backRightColor[0] = r;
         backRightColor[1] = g;
@@ -474,15 +492,17 @@ private:
     glm::vec3 position;
 
     float size;
-};
+}
 
+/// Początkowe pozycje kamery
 float cameraX = 0.0f;
 float cameraY = 0.0f;
 float cameraZ = 5.0f;
-
+/// Początkowe rozmiary kostki i piramidy
 Cube cube(1.0f);      // Początkowy rozmiar kostki
 Pyramid pyramid(1.0f); // Początkowy rozmiar piramidy
 
+/// Funkcja obsługująca wejście
 void processInput(GLFWwindow* window) {
     const float cameraSpeed = 0.001f;
     const float scaleSpeed = 0.001f;
@@ -506,14 +526,16 @@ void processInput(GLFWwindow* window) {
         pyramid.setSize(pyramid.getSize() + scaleSpeed);
     }
     if (glfwGetKey(window, GLFW_KEY_MINUS) == GLFW_PRESS) {
-        // Zwiększ rozmiar piramidy
+        // Zmniejsz rozmiar piramidy
         pyramid.setSize(pyramid.getSize() - scaleSpeed);
     }
 }
 
+/// Fukcja przedstawiająca obsługe myszy
+///
+/// Zmiana koloru kostki po kliknięciu lewego przycisku myszy
 void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        // Zmiana koloru kostki po kliknięciu lewego przycisku myszy
         cube.setFrontColor(static_cast<float>(rand()) / RAND_MAX,
             static_cast<float>(rand()) / RAND_MAX,
             static_cast<float>(rand()) / RAND_MAX);
@@ -589,7 +611,7 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
 
 
 
-
+/// Fukcja związana z oświetelniem
 void renderScene(const Shape& shape1, const Shape& shape2, const Shape& shape3) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
