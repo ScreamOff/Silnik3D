@@ -29,7 +29,7 @@ public:
         // Load image with stb_image
         int width, height, nrChannels;
         stbi_set_flip_vertically_on_load(true);
-        std::string fullPath = R"(C:\\Users\\User\\Desktop\\Projekt3D\\Projekt3D\\tlo.png)" + std::string(texturePath);
+        std::string fullPath = std::string(texturePath);
         unsigned char* data = stbi_load(fullPath.c_str(), &width, &height, &nrChannels, 0);
 
         if (data) {
@@ -78,18 +78,27 @@ public:
         glGenTextures(1, &textureID);
         glBindTexture(GL_TEXTURE_2D, textureID);
 
-        // Wczytanie obrazu z pliku
+        // Load image with stb_image
         int width, height, nrChannels;
         stbi_set_flip_vertically_on_load(true);
-        unsigned char* data = stbi_load(texturePath, &width, &height, &nrChannels, 0);
+        std::string fullPath = std::string(texturePath);
+        unsigned char* data = stbi_load(fullPath.c_str(), &width, &height, &nrChannels, 0);
 
         if (data) {
-            // Ustawienie parametrów tekstury i przypisanie obrazu do tekstury
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-            glGenerateMipmap(GL_TEXTURE_2D);
+            // Set texture parameters
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+            // Specify texture image
+            if (nrChannels == 3) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            }
+            else if (nrChannels == 4) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            }
+            glGenerateMipmap(GL_TEXTURE_2D);
         }
         else {
             std::cerr << "Failed to load texture: " << stbi_failure_reason() << '\n';
@@ -417,6 +426,13 @@ public:
         glVertex3f(size / 2, -size / 2, -size / 2);
         glVertex3f(size / 2, -size / 2, size / 2);
         glEnd();
+
+        glColor3fv(BackColor);
+        glBegin(GL_TRIANGLES);
+        glVertex3f(0.0f, size / 2, 0.0f);
+        glVertex3f(-size / 2, -size / 2, -size / 2);
+        glVertex3f(size / 2, -size / 2, -size / 2);
+        glEnd();
     }
 
     void setBaseColor(GLfloat r, GLfloat g, GLfloat b) {
@@ -443,11 +459,18 @@ public:
         backRightColor[2] = b;
     }
 
+    void setBackColor(GLfloat r, GLfloat g, GLfloat b) {
+        backRightColor[0] = r;
+        backRightColor[1] = g;
+        backRightColor[2] = b;
+    }
+
 private:
     GLfloat baseColor[3] = { 1.0f, 1.0f, 1.0f };
     GLfloat frontColor[3] = { 1.0f, 0.0f, 0.0f };
     GLfloat backLeftColor[3] = { 0.0f, 1.0f, 0.0f };
     GLfloat backRightColor[3] = { 0.0f, 0.0f, 1.0f };
+    GLfloat BackColor[3] = { 0.0f, 0.0f, 1.0f };
     glm::vec3 position;
 
     float size;
@@ -532,6 +555,10 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
             static_cast<float>(rand()) / RAND_MAX,
             static_cast<float>(rand()) / RAND_MAX);
 
+        pyramid.setBackColor(static_cast<float>(rand()) / RAND_MAX,
+            static_cast<float>(rand()) / RAND_MAX,
+            static_cast<float>(rand()) / RAND_MAX);
+
         // Zmiana koloru prostopadłościanu po kliknięciu lewego przycisku myszy
         rectangularPrism.setFrontColor(static_cast<float>(rand()) / RAND_MAX,
             static_cast<float>(rand()) / RAND_MAX,
@@ -556,6 +583,7 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
         rectangularPrism.setBottomColor(static_cast<float>(rand()) / RAND_MAX,
             static_cast<float>(rand()) / RAND_MAX,
             static_cast<float>(rand()) / RAND_MAX);
+
     }
 }
 
